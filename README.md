@@ -180,3 +180,9 @@ npx hardhat run scripts/register-bulk.ts --network mainnet
 ## License
 
 MIT
+
+
+---
+### Contact
+Website: https://onchain-id.id
+Email: info@onchain-id.id

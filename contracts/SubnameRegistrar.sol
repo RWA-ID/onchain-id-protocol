@@ -1,4 +1,10 @@
 // SPDX-License-Identifier: MIT
+/**
+ * Onchain ID Protocol
+ * https://onchain-id.id
+ * Contact: info@onchain-id.id
+ */
+
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
@@ -53,7 +59,8 @@ contract SubnameRegistrar is ERC721Enumerable, Ownable {
         emit LicenseBought(msg.sender, tokenId, parentLabel);
 
         if (msg.value > requiredETH) {
-            payable(msg.sender).transfer(msg.value - requiredETH);
+            (bool success,) = payable(msg.sender).call{value: msg.value - requiredETH}("");
+            require(success, "Refund failed");
         }
     }
 
@@ -70,7 +77,8 @@ contract SubnameRegistrar is ERC721Enumerable, Ownable {
     }
 
     function withdraw() external onlyOwner {
-        payable(payoutAddress).transfer(address(this).balance);
+        (bool success,) = payable(payoutAddress).call{value: address(this).balance}("");
+        require(success, "Withdraw failed");
     }
 
     function _hasLicense(address user, string memory parentLabel) internal view returns (bool) {
@@ -83,28 +91,30 @@ contract SubnameRegistrar is ERC721Enumerable, Ownable {
         }
         return false;
     }
-function hasLicense(address user, string calldata parentLabel) external view returns (bool) {
-    return _hasLicense(user, parentLabel);
-}
 
-function tierForQuantity(uint256 quantity) public view returns (uint256 feePerSubCents) {
-    if (quantity <= 10) return tierPricesUSD[0];
-    if (quantity <= 50) return tierPricesUSD[1];
-    return tierPricesUSD[2];
-}
+    function hasLicense(address user, string calldata parentLabel) external view returns (bool) {
+        return _hasLicense(user, parentLabel);
+    }
 
-// returns required payment in wei for NON-license users
-function quoteBulk(uint256 quantity) external view returns (uint256 requiredWei, uint256 feePerSubCents, uint256 ethPrice8) {
-    require(quantity > 0, "quantity=0");
-    (, int256 ethPrice,,,) = oracle.latestRoundData();
-    require(ethPrice > 0, "Invalid oracle price");
+    function tierForQuantity(uint256 quantity) public view returns (uint256 feePerSubCents) {
+        if (quantity <= 10) return tierPricesUSD[0];
+        if (quantity <= 50) return tierPricesUSD[1];
+        return tierPricesUSD[2];
+    }
 
-    ethPrice8 = uint256(ethPrice);
-    feePerSubCents = tierForQuantity(quantity);
+    // returns required payment in wei for NON-license users
+    function quoteBulk(uint256 quantity) external view returns (uint256 requiredWei, uint256 feePerSubCents, uint256 ethPrice8) {
+        require(quantity > 0, "quantity=0");
+        (, int256 ethPrice,,,) = oracle.latestRoundData();
+        require(ethPrice > 0, "Invalid oracle price");
 
-    // same math you’re already using:
-    requiredWei = (feePerSubCents * quantity * 1e24) / ethPrice8;
-}
+        ethPrice8 = uint256(ethPrice);
+        feePerSubCents = tierForQuantity(quantity);
+
+        // same math you're already using:
+        requiredWei = (feePerSubCents * quantity * 1e24) / ethPrice8;
+    }
+
     function registerBulk(string calldata parentLabel, string[] calldata labels, address to, address resolver, uint64 ttl) external payable {
         bool validParent = false;
         for (uint i = 0; i < parents.length; i++) {
@@ -134,7 +144,8 @@ function quoteBulk(uint256 quantity) external view returns (uint256 requiredWei,
             require(msg.value >= requiredETH, "Insufficient ETH");
 
             if (msg.value > requiredETH) {
-                payable(msg.sender).transfer(msg.value - requiredETH);
+                (bool success,) = payable(msg.sender).call{value: msg.value - requiredETH}("");
+                require(success, "Refund failed");
             }
         }
 

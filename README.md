@@ -61,7 +61,7 @@ All USD prices are converted to ETH at the time of transaction using the Chainli
 
 | Contract | Address |
 |----------|---------|
-| **SubnameRegistrar** | [`0xf2D0f2057A1C5323015cF51baFCDf57293F86d04`](https://etherscan.io/address/0xf2D0f2057A1C5323015cF51baFCDf57293F86d04) |
+| **SubnameRegistrar** | [`0x912C98f1d76728e3A33A6aeFE4d1aB7F6ccfb8cD`](https://etherscan.io/address/0x912C98f1d76728e3A33A6aeFE4d1aB7F6ccfb8cD) |
 
 ### Constructor Arguments
 
@@ -114,7 +114,7 @@ npm run deploy:mainnet
 ### Verify on Etherscan
 
 ```bash
-npx hardhat verify --network mainnet 0xf2D0f2057A1C5323015cF51baFCDf57293F86d04 \
+npx hardhat verify --network mainnet 0x912C98f1d76728e3A33A6aeFE4d1aB7F6ccfb8cD \
   0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401 \
   0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419 \
   0x5f11a48230f7CdaB91A2361576239091E4b1165b \
